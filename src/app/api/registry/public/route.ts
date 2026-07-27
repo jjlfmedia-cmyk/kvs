@@ -32,6 +32,8 @@ export async function GET() {
         metadata_json: true,
         verification_status: true,
         revoked: true,
+        content_type: true,
+        text_content: true,
       }
     });
 
@@ -52,6 +54,11 @@ export async function GET() {
         kvs_id: img.kvs_id,
         kvs_fingerprint: img.kvs_fingerprint,
         upload_date: img.upload_date,
+        content_type: img.content_type || 'image',
+        // Preview del texto protegido (solo los primeros 200 chars son públicos)
+        text_preview: img.content_type === 'text' && img.text_content
+          ? img.text_content.slice(0, 200) + (img.text_content.length > 200 ? '…' : '')
+          : null,
         // Propietario personal (nombre de usuario de la cuenta)
         owner_username: rawUsername,
         // Propietario organizacional (empresa/organización ingresada)

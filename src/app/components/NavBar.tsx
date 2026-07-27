@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ShieldCheck, Menu, X, LogIn, LogOut, FileImage, ShieldAlert } from "lucide-react";
+import { ShieldCheck, Menu, X, LogIn, LogOut, Type } from "lucide-react";
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -43,9 +43,10 @@ export default function NavBar() {
   };
 
   const baseLinks = [
-    { href: "/", label: "Authenticate" },
-    { href: "/verify", label: "Verify" },
-    { href: "/registry/public", label: "Public Registry" },
+    { href: '/', label: 'Protect Image' },
+    { href: '/text', label: 'Protect Text' },
+    { href: '/verify', label: 'Verify' },
+    { href: '/registry/public', label: 'Public Registry' },
   ];
 
   const authLinks = user
@@ -116,6 +117,12 @@ export default function NavBar() {
             </Link>
           )}
           <Link
+            href="/text"
+            className="px-4 py-2 border border-[var(--accent-purple)]/50 text-[var(--accent-purple)] font-mono text-xs font-bold rounded-[12px] hover:bg-[var(--accent-purple)]/10 transition-all duration-200 flex items-center gap-1.5"
+          >
+            <Type size={12} /> Protect Text
+          </Link>
+          <Link
             href="/"
             className="px-5 py-2 bg-[var(--accent-cyan)] text-black font-mono text-xs font-bold rounded-[12px] shadow-[0_0_20px_rgba(0,229,255,0.25)] hover:shadow-cyan-glow-intense hover:scale-105 transition-all duration-200"
           >
@@ -172,6 +179,13 @@ export default function NavBar() {
                 <LogIn size={12} /> Sign In
               </Link>
             )}
+            <Link
+              href="/text"
+              onClick={() => setMobileOpen(false)}
+              className="text-center py-2.5 border border-[var(--accent-purple)]/50 text-[var(--accent-purple)] font-mono font-bold rounded-[12px] text-xs flex items-center justify-center gap-1.5"
+            >
+              <Type size={12} /> Protect Text
+            </Link>
             <Link
               href="/"
               onClick={() => setMobileOpen(false)}

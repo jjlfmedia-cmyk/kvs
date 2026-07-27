@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Loader2, Search, Building2, User, ShieldX, CalendarClock } from 'lucide-react';
+import { ShieldCheck, Loader2, Search, Building2, User, ShieldX, Type, FileText } from 'lucide-react';
 
 export default function PublicRegistryPage() {
   const [images, setImages] = useState<any[]>([]);
@@ -81,21 +81,39 @@ export default function PublicRegistryPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
-                className="glass-card rounded-3xl p-6 border border-[var(--glass-border)] relative overflow-hidden flex flex-col gap-3"
+                className={`glass-card rounded-3xl p-6 border relative overflow-hidden flex flex-col gap-3 ${
+                  img.content_type === 'text'
+                    ? 'border-[var(--accent-purple)]/30'
+                    : 'border-[var(--glass-border)]'
+                }`}
               >
-                {/* Header: KVS ID + Status */}
+                {/* Header: KVS ID + Type badge + Status */}
                 <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck size={15} className="text-[var(--accent-cyan)]" />
-                    <span className="font-mono text-xs font-bold text-[var(--accent-cyan)] truncate">{img.kvs_id}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    {img.content_type === 'text'
+                      ? <Type size={15} className="text-[var(--accent-purple)] shrink-0" />
+                      : <ShieldCheck size={15} className="text-[var(--accent-cyan)] shrink-0" />
+                    }
+                    <span className={`font-mono text-xs font-bold truncate ${
+                      img.content_type === 'text' ? 'text-[var(--accent-purple)]' : 'text-[var(--accent-cyan)]'
+                    }`}>{img.kvs_id}</span>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-full text-[8px] font-mono font-bold border shrink-0 ${
-                    img.revoked ? 'bg-red-500/10 border-red-500/30 text-red-400' :
-                    img.verification_status === 'VERIFIED' ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
-                    'bg-[#F59E0B]/10 border-[#F59E0B]/30 text-[#F59E0B]'
-                  }`}>
-                    {img.revoked ? 'REVOCADO' : img.verification_status}
-                  </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className={`px-2 py-0.5 rounded-full text-[7px] font-mono font-bold border ${
+                      img.content_type === 'text'
+                        ? 'bg-[var(--accent-purple)]/10 border-[var(--accent-purple)]/30 text-[var(--accent-purple)]'
+                        : 'bg-[var(--accent-cyan)]/10 border-[var(--accent-cyan)]/30 text-[var(--accent-cyan)]'
+                    }`}>
+                      {img.content_type === 'text' ? 'TEXTO' : 'IMAGEN'}
+                    </span>
+                    <span className={`px-2.5 py-1 rounded-full text-[8px] font-mono font-bold border ${
+                      img.revoked ? 'bg-red-500/10 border-red-500/30 text-red-400' :
+                      img.verification_status === 'VERIFIED' ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
+                      'bg-[#F59E0B]/10 border-[#F59E0B]/30 text-[#F59E0B]'
+                    }`}>
+                      {img.revoked ? 'REVOCADO' : img.verification_status}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-3 text-xs" data-kvs-verdict={img.verification_status}>

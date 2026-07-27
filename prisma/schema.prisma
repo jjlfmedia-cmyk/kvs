@@ -28,6 +28,8 @@ model Image {
   revoked             Boolean   @default(false)
   revoked_at          DateTime?
   userId              String?
+  content_type        String    @default("image")   // "image" | "text"
+  text_content        String?   @db.Text              // Solo para content_type = "text"
   user                User?     @relation(fields: [userId], references: [id])
 }
 

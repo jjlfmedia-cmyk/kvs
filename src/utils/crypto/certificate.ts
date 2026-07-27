@@ -125,28 +125,52 @@ async function drawCertificatePage(doc: any, kvsData: any, ownerData: any, isCus
 
   curY += 8;
 
-  // ── Section: C2PA ──
-  curY = sectionHeader('C2PA CRYPTOGRAPHIC DOUBLE-SECURITY BINDING', curY);
+  // ── Section: Protected Text Content (solo para activos de texto) OR C2PA (para imágenes) ──
+  const isTextAsset = kvsData.content_type === 'text' || meta.content_type === 'text';
 
-  let c2paStatus = 'NOT SIGNED';
-  let c2paIssuer = 'N/A';
-  let c2paTime = kvsData.upload_date || new Date().toISOString();
-  if (kvsData.c2pa_manifest) {
-    try {
-      const p = JSON.parse(kvsData.c2pa_manifest);
-      if (p && !p.error) {
-        c2paStatus = 'ACTIVE & SECURED IN IMAGE CONTAINER';
-        c2paIssuer = p.issuer || 'C2PA Test Signing Cert';
-        c2paTime = p.signed_at || c2paTime;
-      }
-    } catch { /* ignore */ }
+  if (isTextAsset && kvsData.text_content) {
+    curY = sectionHeader('PROTECTED TEXT CONTENT', curY);
+
+    // Fondo especial para el texto protegido
+    const textBoxH = Math.min(120, 20 + Math.ceil(kvsData.text_content.length / 70) * 13);
+    doc.roundedRect(30, curY, W - 60, textBoxH, 6).fill('#0A0515');
+    doc.roundedRect(30, curY, W - 60, textBoxH, 6).lineWidth(1).stroke('#9D4EDD').strokeOpacity(0.6);
+    doc.strokeOpacity(1);
+    doc.fillColor('#E2E8F0').font('Helvetica').fontSize(8.5)
+      .text(kvsData.text_content.slice(0, 800) + (kvsData.text_content.length > 800 ? '...' : ''),
+        38, curY + 8, { width: W - 76, lineBreak: true });
+    curY += textBoxH + 8;
+
+    const charCount = kvsData.text_content.length;
+    const wordCount = kvsData.text_content.split(/\s+/).filter(Boolean).length;
+    curY = row('Character Count', charCount.toLocaleString(), '#94A3B8', curY);
+    curY = row('Word Count', wordCount.toLocaleString(), '#94A3B8', curY);
+    curY = row('Protection Type', 'SHA-256 Cryptographic Hash + KVS Fingerprint', '#10B981', curY);
+    curY = row('C2PA / Watermark', 'N/A — Text assets use hash-based protection', '#475569', curY);
+    curY += 8;
+  } else {
+    // ── Section: C2PA (solo para imágenes) ──
+    curY = sectionHeader('C2PA CRYPTOGRAPHIC DOUBLE-SECURITY BINDING', curY);
+
+    let c2paStatus = 'NOT SIGNED';
+    let c2paIssuer = 'N/A';
+    let c2paTime = kvsData.upload_date || new Date().toISOString();
+    if (kvsData.c2pa_manifest) {
+      try {
+        const p = JSON.parse(kvsData.c2pa_manifest);
+        if (p && !p.error) {
+          c2paStatus = 'ACTIVE & SECURED IN IMAGE CONTAINER';
+          c2paIssuer = p.issuer || 'C2PA Test Signing Cert';
+          c2paTime = p.signed_at || c2paTime;
+        }
+      } catch { /* ignore */ }
+    }
+
+    curY = row('C2PA Status', c2paStatus, c2paStatus.startsWith('ACTIVE') ? '#10B981' : '#F59E0B', curY);
+    curY = row('Binding Date (UTC)', new Date(c2paTime).toISOString(), '#00E5FF', curY);
+    if (c2paStatus.startsWith('ACTIVE')) curY = row('Authority Issuer', c2paIssuer, '#94A3B8', curY);
+    curY += 8;
   }
-
-  curY = row('C2PA Status', c2paStatus, c2paStatus.startsWith('ACTIVE') ? '#10B981' : '#F59E0B', curY);
-  curY = row('Binding Date (UTC)', new Date(c2paTime).toISOString(), '#00E5FF', curY);
-  if (c2paStatus.startsWith('ACTIVE')) curY = row('Authority Issuer', c2paIssuer, '#94A3B8', curY);
-
-  curY += 8;
 
   // ── Section: Protection Layers ──
   curY = sectionHeader('ACTIVE PROVENANCE & SECURITY LAYERS', curY);
