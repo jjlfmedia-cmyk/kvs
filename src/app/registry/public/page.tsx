@@ -123,10 +123,23 @@ export default function PublicRegistryPage() {
                     <p className="font-semibold text-white truncate">{img.title}</p>
                   </div>
 
+                  {/* Contenido de Texto Protegido (si es activo de texto) */}
+                  {img.content_type === 'text' && img.text_preview && (
+                    <div className="p-3 rounded-2xl bg-black/60 border border-[var(--accent-purple)]/30 font-mono text-[10px] space-y-1.5">
+                      <div className="flex justify-between items-center text-[8px] text-[var(--accent-purple)] tracking-widest font-bold">
+                        <span>★ TEXTO PROTEGIDO INMUTABLE</span>
+                        <span>HASH SHA-256 VERIFICABLE</span>
+                      </div>
+                      <p className="text-white bg-black/40 p-2.5 rounded-xl border border-white/5 whitespace-pre-wrap break-words leading-relaxed font-sans text-xs">
+                        {img.text_preview}
+                      </p>
+                    </div>
+                  )}
+
                   {/* Descripción (si existe) */}
                   {img.description && (
                     <div>
-                      <span className="text-[9px] font-mono text-[var(--accent-purple)] block tracking-widest mb-0.5">DESCRIPCIÓN</span>
+                      <span className="text-[9px] font-mono text-[var(--accent-purple)] block tracking-widest mb-0.5">DESCRIPCIÓN DE USO / METADATO</span>
                       <p className="text-white/70 text-[10px] leading-relaxed line-clamp-2">{img.description}</p>
                     </div>
                   )}
@@ -196,15 +209,20 @@ export default function PublicRegistryPage() {
                     <p className="font-mono text-[9px] break-all text-[var(--accent-purple)] opacity-90">{img.kvs_fingerprint}</p>
                   </div>
 
-                  {/* Owner badge */}
-                  {img.is_owner && (
-                    <div className="mt-1 pt-3 border-t border-white/5 flex items-center justify-between">
+                  {/* Enlaces y Acciones para defensa legal */}
+                  <div className="mt-2 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                    <a
+                      href={`/api/certificate/${img.kvs_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2.5 py-1.5 rounded-xl bg-[var(--accent-purple)]/15 border border-[var(--accent-purple)]/40 text-[var(--accent-purple)] font-mono text-[9px] font-bold hover:bg-[var(--accent-purple)]/30 transition flex items-center gap-1"
+                    >
+                      <FileText size={10} /> DESCARGAR CERTIFICADO LEGAL
+                    </a>
+                    {img.is_owner && (
                       <span className="text-[10px] font-mono text-[#10B981] font-bold">✓ Eres el dueño</span>
-                      <a href="/registry/private" className="text-[10px] font-mono text-[var(--accent-cyan)] hover:underline">
-                        Ver tu foto ↗
-                      </a>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </motion.div>
             ))}

@@ -42,6 +42,7 @@ function buildElement(kvsData: any): React.ReactElement {
     { label: 'PERSONAL OWNER (ACCOUNT)', value: personalOwner, color: '#00E5FF' },
     { label: 'ORGANIZATION / COMPANY', value: org, color: '#9D4EDD' },
     { label: 'ROLE / TITLE', value: role, color: '#FFFFFF' },
+    ...(kvsData.text_content ? [{ label: 'PROTECTED TEXT CONTENT', value: kvsData.text_content.slice(0, 300) + (kvsData.text_content.length > 300 ? '...' : ''), color: '#F1F5F9' }] : []),
     ...(description ? [{ label: 'DESCRIPTION', value: description, color: '#94A3B8' }] : []),
     { label: 'VALID UNTIL', value: expiration, color: '#EF4444' },
     { label: 'AUTHORIZED USAGE', value: usage, color: '#10B981' },
