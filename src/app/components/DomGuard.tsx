@@ -14,6 +14,8 @@ const PROTECTED_SELECTORS = [
   "[data-kvs-org]",
   "[data-kvs-title]",
   "[data-kvs-text]",
+  "[data-kvs-date]",
+  "[data-kvs-exp]",
 ];
 
 export default function DomGuard() {
@@ -68,6 +70,8 @@ export default function DomGuard() {
         "data-kvs-org",
         "data-kvs-title",
         "data-kvs-text",
+        "data-kvs-date",
+        "data-kvs-exp",
         "contenteditable"
       ],
     });

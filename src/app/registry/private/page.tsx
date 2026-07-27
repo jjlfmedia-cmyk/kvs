@@ -86,11 +86,11 @@ export default function PrivateRegistryPage() {
               >
                 <div>
                   <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-4">
-                    <div className="flex items-center gap-2">
+                    <div data-kvs-id={img.kvs_id} className="flex items-center gap-2">
                       <ShieldCheck size={16} className="text-[var(--accent-cyan)]" />
                       <span className="font-mono text-sm font-bold text-[var(--accent-cyan)]">{img.kvs_id}</span>
                     </div>
-                    <span className={`px-2.5 py-1 rounded-full text-[9px] font-mono font-bold border ${
+                    <span data-kvs-verdict={img.verification_status} className={`px-2.5 py-1 rounded-full text-[9px] font-mono font-bold border ${
                       img.revoked ? 'bg-red-500/10 border-red-500/30 text-red-400' :
                       img.verification_status === 'VERIFIED' ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
                       'bg-[#F59E0B]/10 border-[#F59E0B]/30 text-[#F59E0B]'
@@ -114,7 +114,7 @@ export default function PrivateRegistryPage() {
                       <p className="font-semibold text-white truncate">{img.filename}</p>
                     </div>
 
-                    <div>
+                    <div data-kvs-date={img.upload_date}>
                       <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest">FECHA DE REGISTRO</span>
                       <p className="font-mono text-[11px] text-white/90">
                         {new Date(img.upload_date).toLocaleString('es-MX')}

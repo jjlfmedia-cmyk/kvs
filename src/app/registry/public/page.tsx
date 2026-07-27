@@ -183,11 +183,11 @@ export default function PublicRegistryPage() {
 
                   {/* Fechas */}
                   <div className="grid grid-cols-2 gap-2">
-                    <div>
+                    <div data-kvs-date={img.upload_date}>
                       <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest">FECHA DE REGISTRO</span>
                       <p className="text-white font-mono text-[9px]">{new Date(img.upload_date).toLocaleDateString('es-MX')}</p>
                     </div>
-                    <div>
+                    <div data-kvs-exp={img.expiration_date}>
                       <span className="text-[9px] font-mono text-red-400 block tracking-widest flex items-center gap-1">
                         EXPIRACIÓN
                       </span>
