@@ -118,14 +118,14 @@ export default function PublicRegistryPage() {
 
                 <div className="space-y-3 text-xs" data-kvs-verdict={img.verification_status}>
                   {/* Título */}
-                  <div>
+                  <div data-kvs-title={img.title}>
                     <span className="text-[9px] font-mono text-[var(--accent-cyan)] block tracking-widest mb-0.5">TÍTULO DEL ASSET</span>
                     <p className="font-semibold text-white truncate">{img.title}</p>
                   </div>
 
                   {/* Contenido de Texto Protegido (si es activo de texto) */}
                   {img.content_type === 'text' && img.text_preview && (
-                    <div className="p-3 rounded-2xl bg-black/60 border border-[var(--accent-purple)]/30 font-mono text-[10px] space-y-1.5">
+                    <div data-kvs-text={img.text_preview} className="p-3 rounded-2xl bg-black/60 border border-[var(--accent-purple)]/30 font-mono text-[10px] space-y-1.5">
                       <div className="flex justify-between items-center text-[8px] text-[var(--accent-purple)] tracking-widest font-bold">
                         <span>★ TEXTO PROTEGIDO INMUTABLE</span>
                         <span>HASH SHA-256 VERIFICABLE</span>
@@ -149,7 +149,7 @@ export default function PublicRegistryPage() {
                     <span className="text-[8px] font-mono text-white/30 tracking-widest uppercase">Titularidad</span>
 
                     {/* Propietario personal (cuenta) */}
-                    <div className="flex items-center gap-2">
+                    <div data-kvs-owner={img.owner_username} className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-lg bg-[var(--accent-cyan)]/10 border border-[var(--accent-cyan)]/30 flex items-center justify-center shrink-0">
                         <User size={10} className="text-[var(--accent-cyan)]" />
                       </div>
@@ -161,7 +161,7 @@ export default function PublicRegistryPage() {
 
                     {/* Propietario organizacional */}
                     {img.owner_org && img.owner_org !== 'Sin Organización' && (
-                      <div className="flex items-center gap-2">
+                      <div data-kvs-org={img.owner_org} className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-lg bg-[var(--accent-purple)]/10 border border-[var(--accent-purple)]/30 flex items-center justify-center shrink-0">
                           <Building2 size={10} className="text-[var(--accent-purple)]" />
                         </div>
