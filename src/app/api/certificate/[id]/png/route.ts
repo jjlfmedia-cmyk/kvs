@@ -19,8 +19,12 @@ function buildElement(kvsData: any): React.ReactElement {
   } catch { /* ignore */ }
 
   const assetTitle = meta.title || 'Imagen Protegida KVS';
+  // Personal owner: raw username without system suffix
+  const personalOwner = meta.rawUsername ||
+    (kvsData.owner_name ? kvsData.owner_name.replace(/ \(Certificado por Kyllerium System\)$/, '') : 'Kyllerium Guest');
   const org = kvsData.owner_org || meta.organization || 'Sin Organización';
   const role = kvsData.owner_role || meta.role || 'Productor de Contenido';
+  const description = meta.description || '';
   const expiration = meta.expirationDate || 'N/A';
   const usage = meta.usageDescription || 'Uso no restringido';
 
@@ -35,9 +39,10 @@ function buildElement(kvsData: any): React.ReactElement {
     { label: 'KVS FINGERPRINT', value: (kvsData.kvs_fingerprint || 'KVS-FP-NOT-GENERATED').substring(0, 52), color: '#9D4EDD' },
     { label: 'SHA-256 HASH', value: (kvsData.hash_sha256 || 'Pending').substring(0, 52), color: '#CBD5E1' },
     { label: 'ASSET TITLE', value: assetTitle, color: '#FFFFFF' },
-    { label: 'REGISTERED OWNER', value: kvsData.owner_name || 'Kyllerium System', color: '#FFFFFF' },
-    { label: 'ORGANIZATION', value: org, color: '#FFFFFF' },
+    { label: 'PERSONAL OWNER (ACCOUNT)', value: personalOwner, color: '#00E5FF' },
+    { label: 'ORGANIZATION / COMPANY', value: org, color: '#9D4EDD' },
     { label: 'ROLE / TITLE', value: role, color: '#FFFFFF' },
+    ...(description ? [{ label: 'DESCRIPTION', value: description, color: '#94A3B8' }] : []),
     { label: 'VALID UNTIL', value: expiration, color: '#EF4444' },
     { label: 'AUTHORIZED USAGE', value: usage, color: '#10B981' },
     { label: 'TIMESTAMP (UTC)', value: ts, color: '#94A3B8' },

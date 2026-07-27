@@ -27,7 +27,7 @@ export default function Home() {
   const [status, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [progressMsg, setProgressMsg] = useState('');
   const [result, setResult] = useState<any>(null);
-  const [customData, setCustomData] = useState({ name: '', organization: '', role: '', expirationDate: '', usageDescription: '' });
+  const [customData, setCustomData] = useState({ name: '', organization: '', role: '', description: '', expirationDate: '', usageDescription: '' });
   const [enhancing, setEnhancing] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   
@@ -160,9 +160,10 @@ export default function Home() {
 
     const formData = new FormData();
     formData.append('file', finalFile);
-    formData.append('title', customData.name || 'Imagen Protegida KVS'); // Usamos customData.name como título del asset
+    formData.append('title', customData.name || 'Imagen Protegida KVS');
     formData.append('organization', customData.organization || 'Kyllerium System');
     formData.append('role', customData.role || 'Productor de Contenido');
+    formData.append('description', customData.description || '');
     formData.append('expirationDate', customData.expirationDate || '');
     formData.append('usageDescription', customData.usageDescription || 'Uso no restringido');
 
@@ -206,13 +207,11 @@ export default function Home() {
       const res = await fetch('/api/ai-certificate-helper', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ field: 'description', draft: customData.role, context: result })
+        body: JSON.stringify({ field: 'description', draft: customData.description, title: customData.name, context: result })
       });
-      if (!res.ok) {
-        throw new Error('AI Enhancement failed');
-      }
+      if (!res.ok) throw new Error('AI Enhancement failed');
       const data = await res.json();
-      if (data.enhanced) setCustomData(prev => ({ ...prev, role: data.enhanced }));
+      if (data.enhanced) setCustomData(prev => ({ ...prev, description: data.enhanced }));
     } catch (err) {
       console.error(err);
     } finally {
@@ -320,16 +319,7 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <label className="block text-[10px] font-mono text-[var(--text-secondary)] tracking-widest">ROL / CARGO</label>
-                      <button 
-                        onClick={enhanceWithAI} 
-                        disabled={enhancing || !customData.role} 
-                        className="text-[9px] font-mono text-[var(--accent-purple)] hover:underline flex items-center gap-1 shrink-0 cursor-pointer"
-                      >
-                        {enhancing ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />} Mejorar con IA
-                      </button>
-                    </div>
+                    <label className="block text-[10px] font-mono text-[var(--text-secondary)] tracking-widest mb-1.5">ROL / CARGO</label>
                     <input 
                       className="w-full bg-black/40 border border-white/10 rounded-2xl p-3 text-sm focus:border-[var(--accent-purple)] outline-none transition text-white" 
                       placeholder="Ej. Director Creativo" 
@@ -344,6 +334,25 @@ export default function Home() {
                       placeholder="Ej. 31/12/2030 (Vacío = 10 años)" 
                       value={customData.expirationDate} 
                       onChange={e => setCustomData(p => ({ ...p, expirationDate: e.target.value }))} 
+                    />
+                  </div>
+                  <div className="col-span-1 sm:col-span-2">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-[10px] font-mono text-[var(--accent-purple)] tracking-widest">DESCRIPCIÓN BREVE <span className="text-white/30">(Opcional)</span></label>
+                      <button 
+                        onClick={enhanceWithAI} 
+                        disabled={enhancing} 
+                        className="text-[9px] font-mono text-[var(--accent-purple)] hover:underline flex items-center gap-1 shrink-0 cursor-pointer disabled:opacity-40"
+                      >
+                        {enhancing ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />} Mejorar con IA
+                      </button>
+                    </div>
+                    <textarea 
+                      className="w-full bg-black/40 border border-[var(--accent-purple)]/20 rounded-2xl p-3 text-sm focus:border-[var(--accent-purple)] outline-none transition text-white resize-none" 
+                      placeholder="Breve descripción del contenido del asset. La IA puede sugerirte una." 
+                      rows={2}
+                      value={customData.description} 
+                      onChange={e => setCustomData(p => ({ ...p, description: e.target.value }))} 
                     />
                   </div>
                   <div className="col-span-1 sm:col-span-2">
@@ -515,7 +524,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <button onClick={() => { setFile(null); setPreview(null); setStatus('idle'); setResult(null); setCustomData({ name: '', organization: '', role: '', expirationDate: '', usageDescription: '' }); }} className="text-sm font-mono text-[var(--text-secondary)] hover:text-[var(--accent-cyan)] transition underline-offset-4 underline decoration-white/10">
+              <button onClick={() => { setFile(null); setPreview(null); setStatus('idle'); setResult(null); setCustomData({ name: '', organization: '', role: '', description: '', expirationDate: '', usageDescription: '' }); }} className="text-sm font-mono text-[var(--text-secondary)] hover:text-[var(--accent-cyan)] transition underline-offset-4 underline decoration-white/10">
                 [ PROTEGER OTRO ASSET ]
               </button>
             </div>

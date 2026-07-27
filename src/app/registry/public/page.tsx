@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Loader2, Search, Calendar, User, FileImage, ShieldAlert, ShieldX } from 'lucide-react';
+import { ShieldCheck, Loader2, Search, Building2, User, ShieldX, CalendarClock } from 'lucide-react';
 
 export default function PublicRegistryPage() {
   const [images, setImages] = useState<any[]>([]);
@@ -26,12 +26,20 @@ export default function PublicRegistryPage() {
   }, []);
 
   const filteredImages = useMemo(() => {
-    return images.filter(img => 
-      img.kvs_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      img.kvs_fingerprint.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      img.owner_name.toLowerCase().includes(searchQuery.toLowerCase())
+    const q = searchQuery.toLowerCase();
+    return images.filter(img =>
+      img.kvs_id.toLowerCase().includes(q) ||
+      img.kvs_fingerprint.toLowerCase().includes(q) ||
+      img.owner_username.toLowerCase().includes(q) ||
+      img.owner_org.toLowerCase().includes(q) ||
+      img.title.toLowerCase().includes(q)
     );
   }, [images, searchQuery]);
+
+  const formatExpiration = (val: string | null | undefined) => {
+    if (!val) return '—';
+    return val;
+  };
 
   return (
     <div className="min-h-[85vh] p-6 md:p-12 max-w-7xl mx-auto relative z-10">
@@ -51,7 +59,7 @@ export default function PublicRegistryPage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" size={18} />
         <input 
           type="text"
-          placeholder="Buscar por KVS-ID, Huella o Propietario..."
+          placeholder="Buscar por ID, huella, usuario, organización..."
           className="w-full bg-black/40 border border-[var(--glass-border)] rounded-2xl py-4 pl-12 pr-4 font-mono text-xs focus:border-[var(--accent-cyan)] outline-none transition text-white"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -73,14 +81,15 @@ export default function PublicRegistryPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.03 }}
-                className="glass-card rounded-3xl p-6 border border-[var(--glass-border)] relative overflow-hidden"
+                className="glass-card rounded-3xl p-6 border border-[var(--glass-border)] relative overflow-hidden flex flex-col gap-3"
               >
-                <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-4">
+                {/* Header: KVS ID + Status */}
+                <div className="flex items-center justify-between border-b border-white/5 pb-3">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck size={16} className="text-[var(--accent-cyan)]" />
-                    <span className="font-mono text-sm font-bold text-[var(--accent-cyan)]">{img.kvs_id}</span>
+                    <ShieldCheck size={15} className="text-[var(--accent-cyan)]" />
+                    <span className="font-mono text-xs font-bold text-[var(--accent-cyan)] truncate">{img.kvs_id}</span>
                   </div>
-                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-mono font-bold border ${
+                  <span className={`px-2.5 py-1 rounded-full text-[8px] font-mono font-bold border shrink-0 ${
                     img.revoked ? 'bg-red-500/10 border-red-500/30 text-red-400' :
                     img.verification_status === 'VERIFIED' ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
                     'bg-[#F59E0B]/10 border-[#F59E0B]/30 text-[#F59E0B]'
@@ -90,53 +99,88 @@ export default function PublicRegistryPage() {
                 </div>
 
                 <div className="space-y-3 text-xs" data-kvs-verdict={img.verification_status}>
+                  {/* Título */}
                   <div>
                     <span className="text-[9px] font-mono text-[var(--accent-cyan)] block tracking-widest mb-0.5">TÍTULO DEL ASSET</span>
                     <p className="font-semibold text-white truncate">{img.title}</p>
                   </div>
 
-                  <div>
-                    <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest mb-0.5">PROPIETARIO REGISTRADO</span>
-                    <div className="flex items-center gap-1.5 text-white font-medium">
-                      <User size={13} className="opacity-40" />
-                      {img.owner_name}
+                  {/* Descripción (si existe) */}
+                  {img.description && (
+                    <div>
+                      <span className="text-[9px] font-mono text-[var(--accent-purple)] block tracking-widest mb-0.5">DESCRIPCIÓN</span>
+                      <p className="text-white/70 text-[10px] leading-relaxed line-clamp-2">{img.description}</p>
                     </div>
+                  )}
+
+                  {/* DUAL OWNERSHIP */}
+                  <div className="grid grid-cols-1 gap-2 p-3 rounded-2xl bg-black/40 border border-white/5">
+                    <span className="text-[8px] font-mono text-white/30 tracking-widest uppercase">Titularidad</span>
+
+                    {/* Propietario personal (cuenta) */}
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-lg bg-[var(--accent-cyan)]/10 border border-[var(--accent-cyan)]/30 flex items-center justify-center shrink-0">
+                        <User size={10} className="text-[var(--accent-cyan)]" />
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-mono text-[var(--accent-cyan)] tracking-widest">PROPIETARIO PERSONAL</p>
+                        <p className="text-white font-semibold text-[11px] font-mono">{img.owner_username}</p>
+                      </div>
+                    </div>
+
+                    {/* Propietario organizacional */}
+                    {img.owner_org && img.owner_org !== 'Sin Organización' && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-[var(--accent-purple)]/10 border border-[var(--accent-purple)]/30 flex items-center justify-center shrink-0">
+                          <Building2 size={10} className="text-[var(--accent-purple)]" />
+                        </div>
+                        <div>
+                          <p className="text-[8px] font-mono text-[var(--accent-purple)] tracking-widest">ORGANIZACIÓN / EMPRESA</p>
+                          <p className="text-white font-semibold text-[11px] font-mono truncate">{img.owner_org}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Rol */}
+                  {img.owner_role && (
                     <div>
-                      <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest">ORGANIZACIÓN</span>
-                      <p className="text-white font-mono text-[10px] truncate">{img.owner_org}</p>
+                      <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest mb-0.5">ROL / CARGO</span>
+                      <p className="text-white/80 font-mono text-[10px]">{img.owner_role}</p>
                     </div>
-                    <div>
-                      <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest">ROL / CARGO</span>
-                      <p className="text-white font-mono text-[10px] truncate">{img.owner_role}</p>
-                    </div>
-                  </div>
+                  )}
 
+                  {/* Fechas */}
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest">FECHA DE REGISTRO</span>
                       <p className="text-white font-mono text-[9px]">{new Date(img.upload_date).toLocaleDateString('es-MX')}</p>
                     </div>
                     <div>
-                      <span className="text-[9px] font-mono text-red-400 block tracking-widest">EXPIRACIÓN</span>
-                      <p className="text-red-400 font-mono text-[9px]">{img.expiration_date}</p>
+                      <span className="text-[9px] font-mono text-red-400 block tracking-widest flex items-center gap-1">
+                        EXPIRACIÓN
+                      </span>
+                      <p className={`font-mono text-[9px] ${img.expiration_date ? 'text-red-400' : 'text-white/30'}`}>
+                        {formatExpiration(img.expiration_date)}
+                      </p>
                     </div>
                   </div>
 
+                  {/* Uso autorizado */}
                   <div>
                     <span className="text-[9px] font-mono text-[var(--text-secondary)] block tracking-widest mb-0.5">USO AUTORIZADO</span>
                     <p className="text-emerald-400/90 font-mono text-[10px] leading-relaxed line-clamp-2">{img.usage_description}</p>
                   </div>
 
+                  {/* Fingerprint */}
                   <div>
                     <span className="text-[9px] font-mono text-[var(--accent-purple)] block tracking-widest mb-0.5">KVS UNIQUE FINGERPRINT</span>
                     <p className="font-mono text-[9px] break-all text-[var(--accent-purple)] opacity-90">{img.kvs_fingerprint}</p>
                   </div>
 
+                  {/* Owner badge */}
                   {img.is_owner && (
-                    <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                    <div className="mt-1 pt-3 border-t border-white/5 flex items-center justify-between">
                       <span className="text-[10px] font-mono text-[#10B981] font-bold">✓ Eres el dueño</span>
                       <a href="/registry/private" className="text-[10px] font-mono text-[var(--accent-cyan)] hover:underline">
                         Ver tu foto ↗

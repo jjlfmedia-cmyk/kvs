@@ -101,8 +101,12 @@ async function drawCertificatePage(doc: any, kvsData: any, ownerData: any, isCus
   } catch {}
 
   const assetTitle = meta.title || 'Imagen Protegida KVS';
-  const org = kvsData.owner_org || meta.organization || 'Sin Organización';
+  // Propietario personal: rawUsername (username limpio), fallback extrayendo del owner_name
+  const personalOwner = meta.rawUsername ||
+    (kvsData.owner_name ? kvsData.owner_name.replace(/ \(Certificado por Kyllerium System\)$/, '') : 'Kyllerium Guest');
+  const org = kvsData.owner_org || meta.organization || 'Sin Organizaci\u00f3n';
   const role = kvsData.owner_role || meta.role || 'Productor de Contenido';
+  const description = meta.description || '';
   const expiration = meta.expirationDate || 'N/A';
   const usage = meta.usageDescription || 'Uso no restringido';
 
@@ -111,9 +115,10 @@ async function drawCertificatePage(doc: any, kvsData: any, ownerData: any, isCus
   curY = row('KVS Fingerprint', kvsData.kvs_fingerprint || 'KVS-FP-NOT-GENERATED', '#9D4EDD', curY);
   curY = row('SHA-256 Hash', kvsData.hash_sha256 || 'Pending', '#CBD5E1', curY);
   curY = row('Asset Title', assetTitle, '#FFFFFF', curY);
-  curY = row('Registered Owner', kvsData.owner_name || 'Kyllerium System', '#FFFFFF', curY);
-  curY = row('Organization', org, '#FFFFFF', curY);
+  curY = row('Personal Owner (Account)', personalOwner, '#00E5FF', curY);
+  curY = row('Organization / Company', org, '#9D4EDD', curY);
   curY = row('Role / Title', role, '#FFFFFF', curY);
+  if (description) curY = row('Description', description, '#94A3B8', curY);
   curY = row('Valid Until', expiration, '#EF4444', curY);
   curY = row('Authorized Usage', usage, '#10B981', curY);
   curY = row('Timestamp (UTC)', new Date(kvsData.upload_date || Date.now()).toISOString(), '#94A3B8', curY);

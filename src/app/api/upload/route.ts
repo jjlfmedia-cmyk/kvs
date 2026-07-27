@@ -55,6 +55,7 @@ export async function POST(req: Request) {
     const title = formData.get('title') as string || 'Imagen Protegida KVS';
     const organization = formData.get('organization') as string || 'Sin Organización';
     const role = formData.get('role') as string || 'Productor de Contenido';
+    const description = formData.get('description') as string || '';
     let expirationDate = formData.get('expirationDate') as string || '';
     const usageDescription = formData.get('usageDescription') as string || 'Uso no restringido';
 
@@ -79,6 +80,7 @@ export async function POST(req: Request) {
     // ── Get authenticated user from session cookie for Ownership ──
     let authUserId: string | null = null;
     let ownerName = 'Kyllerium Guest';
+    let rawUsername = 'Kyllerium Guest'; // Username limpio sin sufijos
     try {
       const cookieStore = await cookies();
       const token = cookieStore.get('kvs_session')?.value;
@@ -86,7 +88,8 @@ export async function POST(req: Request) {
         const payload = await verifyJWT(token);
         if (payload) {
           authUserId = payload.userId;
-          ownerName = payload.username; // Usar su nombre de usuario real
+          rawUsername = payload.username;
+          ownerName = payload.username;
         }
       }
     } catch (cookieErr) {
@@ -172,8 +175,10 @@ export async function POST(req: Request) {
           title,
           organization,
           role,
+          description,
           expirationDate,
-          usageDescription
+          usageDescription,
+          rawUsername // Username limpio para mostrar como propietario personal
         }),
         c2pa_manifest: c2paResult.manifestSummary,
         owner_name: officialOwner,
